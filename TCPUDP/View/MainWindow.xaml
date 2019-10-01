@@ -1,0 +1,35 @@
+﻿<Window x:Class="TCPUDP.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:view="clr-namespace:TCPUDP.View"
+        xmlns:viewmodel="clr-namespace:TCPUDP.ViewModel"
+        xmlns:local="clr-namespace:TCPUDP"
+        mc:Ignorable="d"
+        Title="MainWindow" MinHeight="800" MinWidth="900" Height="800" Width="900">
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+    </Window.Resources>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="{Binding LocalIP}" Grid.Row="0" Grid.Column="0" FontSize="20"/>
+        <view:TCPIPView Grid.Row="1" Grid.Column="0" DataContext="{Binding TCPSend}"/>
+        <view:TCPIPView Grid.Row="1" Grid.Column="1" DataContext="{Binding TCPReceive}"/>
+        <view:UDPView Grid.Row="2" Grid.Column="0" DataContext="{Binding UDPSend}"/>
+        <view:UDPView Grid.Row="2" Grid.Column="1" DataContext="{Binding UDPReceive}"/>
+    </Grid>
+</Window>
