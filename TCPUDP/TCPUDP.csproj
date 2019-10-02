@@ -57,6 +57,9 @@
     </ApplicationDefinition>
     <Compile Include="ViewModel\BaseConnectionViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="View\BooleanControl.xaml.cs">
+      <DependentUpon>BooleanControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\UDPView.xaml.cs">
       <DependentUpon>UDPView.xaml</DependentUpon>
     </Compile>
@@ -67,6 +70,10 @@
     <Compile Include="ViewModel\TCPIPViewModel.cs" />
     <Compile Include="ViewModel\UDPViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
+    <Page Include="View\BooleanControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -37,7 +37,7 @@ namespace TCPUDP.ViewModel
 
         public string MyIPAddress
         {
-            get { return ipAddress; }
+            get { return myIPAddress; }
             set
             {
                 if (System.Net.IPAddress.TryParse(value, out System.Net.IPAddress ip))
@@ -67,6 +67,7 @@ namespace TCPUDP.ViewModel
             {
                 SetProperty(ref isConnected, value, "IsConnected");
                 OnPropertyChanged("ButtonConnect");
+                OnPropertyChanged("ButtonListen");
             }
         }
         private bool isListening;
@@ -77,6 +78,7 @@ namespace TCPUDP.ViewModel
             set
             {
                 SetProperty(ref isListening, value, "IsListening");
+                OnPropertyChanged("ButtonConnect");
                 OnPropertyChanged("ButtonListen");
             }
         }
@@ -92,7 +94,7 @@ namespace TCPUDP.ViewModel
 
             }
         }
-        private string messageToSend;
+        private string messageToSend = string.Empty;
 
         public string MessageToSend
         {
@@ -115,11 +117,11 @@ namespace TCPUDP.ViewModel
 
         protected bool CanListen(object argument)
         {
-            return !IsConnected;
+            return !IsListening || !IsConnected;
         }
         protected bool CanConnect(object argument)
         {
-            return !IsListening;
+            return !IsListening || !IsConnected;
         }
         protected Task currentTask;
         protected CancellationToken token;

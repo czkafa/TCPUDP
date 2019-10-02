@@ -31,10 +31,8 @@ namespace TCPUDP.ViewModel
         Queue<string> messagesToSend = new Queue<string>();
         private void SendMessage(object obj)
         {
-            if (currentTcpClient != null)
-            {
-                messagesToSend.Enqueue(MessageToSend);
-            }
+            messagesToSend.Enqueue(MessageToSend);
+            MessageToSend = string.Empty;
         }
 
         private bool CanSendMessage(object arg)
@@ -90,7 +88,6 @@ namespace TCPUDP.ViewModel
                         }
                     }
                     TcpClient client = server.AcceptTcpClient();
-                    IsListening = false;
 
                     IsConnected = client.Connected;
                     Connection(client);
@@ -110,14 +107,14 @@ namespace TCPUDP.ViewModel
 
         private void Connection(TcpClient client)
         {
-            while (true)
+            while (client.Connected)
             {
                 Byte[] bytes = new Byte[256];
                 string data = null;
 
                 if (messagesToSend.Count > 0)
                 {
-                    SendMessage(client, messagesToSend.Peek());
+                    SendMessage(client, messagesToSend.Dequeue());
                 }
                 else if (cts.IsCancellationRequested)
                 {
@@ -128,17 +125,20 @@ namespace TCPUDP.ViewModel
                 {
                     NetworkStream stream = client.GetStream();
                     int i;
-
-                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    if (stream.DataAvailable)
                     {
-                        data = System.Text.Encoding.UTF8.GetString(bytes, 0, i);
-                        data = data.ToUpper();
 
-                        byte[] msg = System.Text.Encoding.UTF8.GetBytes(data);
+                        while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                        {
+                            data = System.Text.Encoding.UTF8.GetString(bytes, 0, i);
+                            data = data.ToUpper();
 
-                        stream.Write(msg, 0, msg.Length);
-                        ErrorMessage = string.Format("Received: {0}", data);
-                        MessageReceived = data;
+                            byte[] msg = System.Text.Encoding.UTF8.GetBytes(data);
+
+                            stream.Write(msg, 0, msg.Length);
+                            ErrorMessage = string.Format("Received: {0}", data);
+                            MessageReceived = data;
+                        }
                     }
 
                 }
@@ -191,18 +191,22 @@ namespace TCPUDP.ViewModel
         private void SendMessage(TcpClient client, string message)
         {
             Byte[] data = System.Text.Encoding.UTF8.GetBytes(message);
-            NetworkStream stream = client.GetStream();
+            using (NetworkStream stream = client.GetStream())
+            {
+                stream.Write(data, 0, data.Length);
 
-            stream.Write(data, 0, data.Length);
+                data = new Byte[256];
 
-            data = new Byte[256];
+                String responseData = String.Empty;
 
-            String responseData = String.Empty;
+                Int32 bytes = stream.Read(data, 0, data.Length);
+                responseData = System.Text.Encoding.UTF8.GetString(data, 0, bytes);
+                ErrorMessage = string.Format("Sent: {0}", responseData);
+                //stream.Close();
 
-            Int32 bytes = stream.Read(data, 0, data.Length);
-            responseData = System.Text.Encoding.UTF8.GetString(data, 0, bytes);
-            ErrorMessage = string.Format("Sent: {0}", responseData);
-            stream.Close();
+            }
+
+
         }
     }
 }
