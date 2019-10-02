@@ -93,6 +93,8 @@
             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding IPAddress}"></TextBox>
             <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Port}"></TextBox>
             <ToggleButton Grid.Row="2" Grid.Column="3" Command="{Binding ButtonListen}">Listen</ToggleButton>
+            <Button  Grid.Row="3" Grid.Column="3" Command="{Binding DisconnectCommand}">Disconnect</Button>
+            <view:BooleanControl IsToggled="{Binding IsConnected}" Grid.Row="3" Grid.Column="4"></view:BooleanControl>
             <Label Grid.Row="3" Grid.ColumnSpan="2" >受信メッセージ</Label>
             <ToggleButton Style="{StaticResource toggleButton}" Grid.Row="1" Grid.Column="4" IsEnabled="False" IsChecked="{Binding IsConnected}">Connected</ToggleButton>
             <ToggleButton Style="{StaticResource toggleButton}" Grid.Row="2" Grid.Column="4" IsEnabled="False" IsChecked="{Binding IsListening}">Listenig</ToggleButton>

@@ -16,18 +16,10 @@ namespace TCPUDP.ViewModel
         public UDPViewModel() : this("127.0.0.1", 11000, "127.0.0.1", 10000)
         {
         }
-        public UDPViewModel(string startingMyIP, int startingMyPort, string startingIP, int startingPort)
+        public UDPViewModel(string startingMyIP, int startingMyPort, string startingIP, int startingPort) : base(startingMyIP, startingMyPort, startingIP, startingPort)
         {
-            MyIPAddress = startingMyIP;
-            MyPort = startingMyPort;
-            IPAddress = startingIP;
-            Port = startingPort;
             ButtonConnect = new RelayCommand(Connect, CanConnect);
-
             ButtonListen = new RelayCommand(Listen, CanListen);
-
-            cts = new CancellationTokenSource();
-            token = cts.Token;
             strokeCollection = new StrokeCollection();
             imageReceieved = new StrokeCollection();
         }
@@ -164,14 +156,12 @@ namespace TCPUDP.ViewModel
             StrokeCollection sc = ImageToShow;
             using (MemoryStream inkMemStream = new MemoryStream())
             {
-
                 sc.Save(inkMemStream);
                 return inkMemStream;
             }
         }
         public StrokeCollection ImageToStroke(byte[] bmpBytes)
         {
-
             StrokeCollection sc = ImageToShow;
             using (MemoryStream inkMemStream = new MemoryStream(bmpBytes))
             {

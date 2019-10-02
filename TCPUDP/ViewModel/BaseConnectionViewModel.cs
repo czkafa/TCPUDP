@@ -9,6 +9,19 @@ namespace TCPUDP.ViewModel
 {
     public abstract class BaseConnectionViewModel : ViewModelBase
     {
+        public BaseConnectionViewModel(string startingMyIP, int startingMyPort, string startingIP, int startingPort)
+        {
+            MyIPAddress = startingMyIP;
+            MyPort = startingMyPort;
+            IPAddress = startingIP;
+            Port = startingPort;
+
+            DisconnectCommand = new RelayCommand(ExecuteDisconnect, CanDisconnect);
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+        }
+
+
         private string ipAddress;
 
         public string IPAddress
@@ -117,11 +130,11 @@ namespace TCPUDP.ViewModel
 
         protected bool CanListen(object argument)
         {
-            return !IsListening || !IsConnected;
+            return !IsListening && !IsConnected;
         }
         protected bool CanConnect(object argument)
         {
-            return !IsListening || !IsConnected;
+            return !IsListening && !IsConnected;
         }
         protected Task currentTask;
         protected CancellationToken token;
@@ -134,6 +147,24 @@ namespace TCPUDP.ViewModel
         public RelayCommand ButtonListen
         {
             get; set;
+        }
+        public RelayCommand DisconnectCommand
+        {
+            get; set;
+        }
+
+        protected void ExecuteDisconnect(object obj)
+        {
+            if (currentTask != null)
+            {
+                cts.Cancel();
+                currentTask = null;
+            }
+        }
+
+        protected bool CanDisconnect(object arg)
+        {
+            return currentTask != null;
         }
     }
 }

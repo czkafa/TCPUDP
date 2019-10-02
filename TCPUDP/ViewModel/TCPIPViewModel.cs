@@ -15,19 +15,13 @@ namespace TCPUDP.ViewModel
         {
         }
 
-        public TCPIPViewModel(string startingMyIP, int startingMyPort, string startingIP, int startingPort)
+        public TCPIPViewModel(string startingMyIP, int startingMyPort, string startingIP, int startingPort) : base(startingMyIP, startingMyPort, startingIP, startingPort)
         {
-            MyIPAddress = startingMyIP;
-            MyPort = startingMyPort;
-            IPAddress = startingIP;
-            Port = startingPort;
             ButtonConnect = new RelayCommand(Connect, CanConnect);
             ButtonListen = new RelayCommand(Listen, CanListen);
             SendMessageCommand = new RelayCommand(SendMessage, CanSendMessage);
-
-            cts = new CancellationTokenSource();
-            token = cts.Token;
         }
+
         Queue<string> messagesToSend = new Queue<string>();
         private void SendMessage(object obj)
         {
@@ -45,15 +39,12 @@ namespace TCPUDP.ViewModel
             get; set;
         }
 
-        TcpClient currentTcpClient = null;
-
         private void Listen(object obj)
         {
             if (currentTask != null)
             {
                 cts.Cancel();
                 currentTask = null;
-                IsListening = false;
             }
             else
             {
@@ -69,13 +60,10 @@ namespace TCPUDP.ViewModel
             TcpListener server = null;
             try
             {
-                Int32 defaultPort = 13000;
-                IPAddress localAddr = System.Net.IPAddress.Parse(string.IsNullOrWhiteSpace(MyIPAddress) ? "127.0.0.1" : MyIPAddress);
-                server = new TcpListener(localAddr, Port == 0 ? defaultPort : MyPort);
+                IPAddress localAddr = System.Net.IPAddress.Parse(MyIPAddress);
+                server = new TcpListener(localAddr, MyPort);
                 server.Start();
                 IsListening = true;
-
-                String data = null;
 
                 while (true)
                 {
@@ -107,43 +95,60 @@ namespace TCPUDP.ViewModel
 
         private void Connection(TcpClient client)
         {
-            while (client.Connected)
+            using (NetworkStream stream = client.GetStream())
             {
-                Byte[] bytes = new Byte[256];
-                string data = null;
-
-                if (messagesToSend.Count > 0)
+                while (client.Connected)
                 {
-                    SendMessage(client, messagesToSend.Dequeue());
+                    if (cts.IsCancellationRequested)
+                    {
+                        stream.Close();
+                        client.Close();
+                        return;
+                    }
+                    else if (messagesToSend.Count > 0)
+                    {
+                        SendMessage(stream, messagesToSend.Dequeue());
+                    }
+                    else if (stream.DataAvailable)
+                    {
+                        Byte[] bytes = new Byte[256];
+                        int i = stream.Read(bytes, 0, bytes.Length);
+                        string data = null;
+                        data = System.Text.Encoding.UTF8.GetString(bytes, 0, i);
+                        ErrorMessage = string.Format("Received: {0}", data);
+                        MessageReceived = data;
+                    }
+                    else if (!IsTcpIPStill(client))
+                    {
+                        stream.Close();
+                        client.Close();
+                        return;
+                    }
+                    Thread.Sleep(300);
                 }
-                else if (cts.IsCancellationRequested)
+            }
+        }
+
+        private bool IsTcpIPStill(TcpClient tcpClient)
+        {
+            System.Net.NetworkInformation.IPGlobalProperties ipProperties = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties();
+            System.Net.NetworkInformation.TcpConnectionInformation[] tcpConnections = ipProperties.GetActiveTcpConnections().Where(x => x.LocalEndPoint.Equals(tcpClient.Client.LocalEndPoint) && x.RemoteEndPoint.Equals(tcpClient.Client.RemoteEndPoint)).ToArray();
+
+            if (tcpConnections != null && tcpConnections.Length > 0)
+            {
+                System.Net.NetworkInformation.TcpState stateOfConnection = tcpConnections.First().State;
+                if (stateOfConnection == System.Net.NetworkInformation.TcpState.Established)
                 {
-                    client.Close();
-                    return;
+                    // Connection is OK
+                    return true;
                 }
                 else
                 {
-                    NetworkStream stream = client.GetStream();
-                    int i;
-                    if (stream.DataAvailable)
-                    {
-
-                        while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-                        {
-                            data = System.Text.Encoding.UTF8.GetString(bytes, 0, i);
-                            data = data.ToUpper();
-
-                            byte[] msg = System.Text.Encoding.UTF8.GetBytes(data);
-
-                            stream.Write(msg, 0, msg.Length);
-                            ErrorMessage = string.Format("Received: {0}", data);
-                            MessageReceived = data;
-                        }
-                    }
-
+                    // No active tcp Connection to hostName:port
+                    return false;
                 }
-                Thread.Sleep(100);
             }
+            return false;
         }
 
         private void Connect(object argument)
@@ -166,9 +171,7 @@ namespace TCPUDP.ViewModel
         {
             try
             {
-                Int32 defaultPort = 13000;
-                string defaultMessage = "{@.@}デフォルトメッセージ";
-                TcpClient client = new TcpClient(IPAddress, Port == 0 ? defaultPort : Port);
+                TcpClient client = new TcpClient(IPAddress, Port);
                 IsConnected = client.Connected;
 
                 Connection(client);
@@ -188,25 +191,12 @@ namespace TCPUDP.ViewModel
             }
         }
 
-        private void SendMessage(TcpClient client, string message)
+        private void SendMessage(NetworkStream stream, string message)
         {
             Byte[] data = System.Text.Encoding.UTF8.GetBytes(message);
-            using (NetworkStream stream = client.GetStream())
-            {
-                stream.Write(data, 0, data.Length);
 
-                data = new Byte[256];
-
-                String responseData = String.Empty;
-
-                Int32 bytes = stream.Read(data, 0, data.Length);
-                responseData = System.Text.Encoding.UTF8.GetString(data, 0, bytes);
-                ErrorMessage = string.Format("Sent: {0}", responseData);
-                //stream.Close();
-
-            }
-
-
+            stream.Write(data, 0, data.Length);
+            ErrorMessage = string.Format("Sent: {0}", message);
         }
     }
 }
