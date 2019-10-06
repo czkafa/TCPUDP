@@ -57,8 +57,16 @@
     </ApplicationDefinition>
     <Compile Include="ViewModel\BaseConnectionViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="ViewModel\TCPIPScreenViewModel.cs" />
+    <Compile Include="ViewModel\UDPScreenViewModel.cs" />
     <Compile Include="View\BooleanControl.xaml.cs">
       <DependentUpon>BooleanControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\TCPIPScreenView.xaml.cs">
+      <DependentUpon>TCPIPScreenView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UDPScreenView.xaml.cs">
+      <DependentUpon>UDPScreenView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\UDPView.xaml.cs">
       <DependentUpon>UDPView.xaml</DependentUpon>
@@ -86,6 +94,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\TCPIPScreenView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UDPScreenView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\UDPView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

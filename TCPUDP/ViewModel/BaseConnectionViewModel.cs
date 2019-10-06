@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace TCPUDP.ViewModel
 {
@@ -81,6 +82,7 @@ namespace TCPUDP.ViewModel
                 SetProperty(ref isConnected, value, "IsConnected");
                 OnPropertyChanged("ButtonConnect");
                 OnPropertyChanged("ButtonListen");
+                CommandManager.InvalidateRequerySuggested();
             }
         }
         private bool isListening;
@@ -93,6 +95,7 @@ namespace TCPUDP.ViewModel
                 SetProperty(ref isListening, value, "IsListening");
                 OnPropertyChanged("ButtonConnect");
                 OnPropertyChanged("ButtonListen");
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 

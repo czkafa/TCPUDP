@@ -16,7 +16,8 @@ namespace TCPUDP.ViewModel
         public UDPViewModel() : this("127.0.0.1", 11000, "127.0.0.1", 10000)
         {
         }
-        public UDPViewModel(string startingMyIP, int startingMyPort, string startingIP, int startingPort) : base(startingMyIP, startingMyPort, startingIP, startingPort)
+        public UDPViewModel(string startingMyIP, int startingMyPort, string startingIP, int startingPort)
+            : base(startingMyIP, startingMyPort, startingIP, startingPort)
         {
             ButtonConnect = new RelayCommand(Connect, CanConnect);
             ButtonListen = new RelayCommand(Listen, CanListen);
@@ -49,12 +50,16 @@ namespace TCPUDP.ViewModel
             {
                 while (true)
                 {
+                    Thread.Sleep(100);
                     if (cts.IsCancellationRequested)
                     {
+                        IsConnected = false;
+                        ErrorMessage = string.Format($"Disconnected");
                         break;
                     }
                     if (listener.Available > 0)
                     {
+                        IsConnected = true;
                         byte[] bytes = listener.Receive(ref groupEP);
 
                         ErrorMessage = string.Format($"Received broadcast from {groupEP} :");
@@ -66,6 +71,11 @@ namespace TCPUDP.ViewModel
                         {
                             ErrorMessage = string.Format(e.Message);
                         }
+                    }
+                    else
+                    {
+                        IsConnected = false;
+                        ErrorMessage = string.Format($"Waiting...");
                     }
                 }
             }
@@ -97,7 +107,6 @@ namespace TCPUDP.ViewModel
         }
         private void ConnectTask()
         {
-
             IsConnected = true;
             IPAddress localAddr = System.Net.IPAddress.Parse(string.IsNullOrWhiteSpace(MyIPAddress) ? "127.0.0.1" : MyIPAddress);
             IPEndPoint udpClientEndPoint = new IPEndPoint(localAddr, MyPort);
@@ -114,6 +123,8 @@ namespace TCPUDP.ViewModel
                     Thread.Sleep(100);
                     if (cts.IsCancellationRequested)
                     {
+                        IsConnected = false;
+                        ErrorMessage = string.Format($"Disconnected");
                         break;
                     }
                     MemoryStream ms = ConvertStrokestoImage();

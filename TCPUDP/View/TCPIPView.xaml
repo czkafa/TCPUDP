@@ -85,14 +85,14 @@
             </Grid.RowDefinitions>
             <Label Grid.Column="1">IP</Label>
             <Label Grid.Column="2">Port</Label>
-            <ToggleButton Grid.Column="3" Grid.Row="1" Command="{Binding ButtonConnect}">Connect</ToggleButton>
+            <ToggleButton Grid.Column="3" Grid.Row="1" Command="{Binding ButtonConnect, UpdateSourceTrigger=PropertyChanged}">Connect</ToggleButton>
             <Label Grid.Column="0" Grid.Row="1" >自分</Label>
             <Label Grid.Column="0"  Grid.Row="2">相手</Label>
             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding MyIPAddress}"></TextBox>
             <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding MyPort}"></TextBox>
             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding IPAddress}"></TextBox>
             <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Port}"></TextBox>
-            <ToggleButton Grid.Row="2" Grid.Column="3" Command="{Binding ButtonListen}">Listen</ToggleButton>
+            <ToggleButton Grid.Row="2" Grid.Column="3" Command="{Binding ButtonListen, UpdateSourceTrigger=PropertyChanged}">Listen</ToggleButton>
             <Button  Grid.Row="3" Grid.Column="3" Command="{Binding DisconnectCommand}">Disconnect</Button>
             <view:BooleanControl IsToggled="{Binding IsConnected}" Grid.Row="3" Grid.Column="4"></view:BooleanControl>
             <Label Grid.Row="3" Grid.ColumnSpan="2" >受信メッセージ</Label>
@@ -105,7 +105,7 @@
             </TextBox>
             <TextBlock Grid.Row="7"  Grid.ColumnSpan="4" Text="{Binding ErrorMessage}"></TextBlock>
             <!--<ToggleButton Style="{StaticResource connectedToggle}" IsChecked="{Binding IsConnected}" Grid.Row="7" Grid.Column="3" ></ToggleButton>-->
-            <view:BooleanControl IsToggled="{Binding IsConnected}" Grid.Row="7" Grid.Column="3"></view:BooleanControl>
+            <view:BooleanControl IsToggled="{Binding IsConnected, UpdateSourceTrigger=PropertyChanged}" Grid.Row="7" Grid.Column="3"></view:BooleanControl>
             <Button  Grid.Row="7" Grid.Column="4" Command="{Binding SendMessageCommand}">Send</Button>
         </Grid>
 

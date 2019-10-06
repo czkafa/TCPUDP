@@ -5,10 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:view="clr-namespace:TCPUDP.View"
         xmlns:viewmodel="clr-namespace:TCPUDP.ViewModel"
-        xmlns:local="clr-namespace:TCPUDP"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="800" MinWidth="900" Height="800" Width="900">
+        Title="MainWindow" MinHeight="500" MinWidth="900" Height="500" Width="1000">
     <Window.Resources>
+        <DataTemplate DataType="{x:Type viewmodel:TCPIPScreenViewModel}">
+            <view:TCPIPScreenView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodel:UDPScreenViewModel}">
+            <view:UDPScreenView/>
+        </DataTemplate>
+        <Style x:Key="MainButton" TargetType="Button">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Blue"/>
+        </Style>
         <Style TargetType="TextBox">
             <Setter Property="FontSize" Value="20"/>
         </Style>
@@ -17,19 +27,28 @@
         </Style>
     </Window.Resources>
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+
+        <Button Grid.Column="2" Command="{Binding Path=TCPCommand}" Style="{StaticResource MainButton}">TCP</Button>
+        <Button Grid.Column="3" Command="{Binding Path=UDPCommand}" Style="{StaticResource MainButton}">UDP</Button>
         <Label Content="{Binding LocalIP}" Grid.Row="0" Grid.Column="0" FontSize="20"/>
-        <view:TCPIPView Grid.Row="1" Grid.Column="0" DataContext="{Binding TCPSend}"/>
+        <Viewbox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Stretch="Fill" StretchDirection="Both">
+                            <!--HorizontalAlignment="Stretch" VerticalAlignment="Stretch"-->
+            <ContentControl Name="contentControl"
+                    Content="{Binding CurrentPageViewModel}" />
+        </Viewbox>
+        <!--<view:TCPIPView Grid.Row="1" Grid.Column="0" DataContext="{Binding TCPSend}"/>
         <view:TCPIPView Grid.Row="1" Grid.Column="1" DataContext="{Binding TCPReceive}"/>
         <view:UDPView Grid.Row="2" Grid.Column="0" DataContext="{Binding UDPSend}"/>
-        <view:UDPView Grid.Row="2" Grid.Column="1" DataContext="{Binding UDPReceive}"/>
+        <view:UDPView Grid.Row="2" Grid.Column="1" DataContext="{Binding UDPReceive}"/>-->
     </Grid>
 </Window>
