@@ -37,7 +37,7 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
+        <ListBox ItemsSource="{Binding IPAddresses}" />
         <Button Grid.Column="2" Command="{Binding Path=TCPCommand}" Style="{StaticResource MainButton}">TCP</Button>
         <Button Grid.Column="3" Command="{Binding Path=UDPCommand}" Style="{StaticResource MainButton}">UDP</Button>
         <Label Content="{Binding LocalIP}" Grid.Row="0" Grid.Column="0" FontSize="20"/>
